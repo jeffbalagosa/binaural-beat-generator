@@ -6,6 +6,7 @@ import threading
 DEFAULT_BASE_FREQ = 100  # Hz
 DEFAULT_BEAT_FREQ = 15  # Hz
 DEFAULT_DURATION = 25  # minutes
+DEFAULT_VOLUME = 0.1  # 0.0 to 1.0
 
 
 def play_binaural_beat(
@@ -13,7 +14,7 @@ def play_binaural_beat(
     beat_freq=DEFAULT_BEAT_FREQ,
     duration=DEFAULT_DURATION,
     sample_rate=44100,
-    volume=0.5,
+    volume=DEFAULT_VOLUME,
 ):
     """
     Plays a binaural beat for a given duration.
@@ -43,7 +44,7 @@ def play_binaural_beat(
     # Play the stereo audio in a separate thread so we can stop it
     def play():
         print(
-            f"Playing binaural beats with {base_freq} Hz (left) and {base_freq + beat_freq} Hz (right) for {duration} minutes."
+            f"Playing binaural beats with {base_freq} Hz (left) and {base_freq + beat_freq} Hz (right) for {duration} minutes at volume {volume}."
         )
         sd.play(stereo_signal, samplerate=sample_rate)
         sd.wait()
@@ -67,8 +68,16 @@ if __name__ == "__main__":
             input("Enter beat frequency (Hz) [e.g., 15]: ") or DEFAULT_BEAT_FREQ
         )
         dur = float(input("Enter duration (minutes) [e.g., 25]: ") or DEFAULT_DURATION)
+        volume = float(
+            input("Enter volume (0.0 to 1.0) [e.g., 0.1]: ") or DEFAULT_VOLUME
+        )
     except ValueError:
         print("Invalid input. Using default values.")
-        base, beat, dur = DEFAULT_BASE_FREQ, DEFAULT_BEAT_FREQ, DEFAULT_DURATION
+        base, beat, dur, volume = (
+            DEFAULT_BASE_FREQ,
+            DEFAULT_BEAT_FREQ,
+            DEFAULT_DURATION,
+            DEFAULT_VOLUME,
+        )
 
-    play_binaural_beat(base_freq=base, beat_freq=beat, duration=dur)
+    play_binaural_beat(base_freq=base, beat_freq=beat, duration=dur, volume=volume)
