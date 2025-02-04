@@ -14,7 +14,7 @@ A simple Python script that generates binaural beats to enhance focus, relaxatio
 
 1. **Clone this repository** (or download the script directly):
    ```sh
-   git clone https://github.com/your-repo/binaural-beat-generator.git
+   git clone https://github.com/jeffbalagosa/binaural-beat-generator.git
    cd binaural-beat-generator
    ```
 
