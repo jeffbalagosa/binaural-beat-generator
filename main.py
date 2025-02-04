@@ -12,12 +12,17 @@ def play_binaural_beat(
     - base_freq: The base frequency in Hz for the left ear.
     - beat_freq: The frequency difference between the ears (in Hz).
                 The right ear tone will be (base_freq + beat_freq).
-    - duration: Duration of the sound in seconds.
+    - duration: Duration of the sound in minutes.
     - sample_rate: Audio sample rate.
     - volume: Volume scaling factor (0.0 to 1.0).
     """
+    # Convert minutes to seconds
+    duration_seconds = duration * 60
+
     # Create a time array
-    t = np.linspace(0, duration, int(sample_rate * duration), endpoint=False)
+    t = np.linspace(
+        0, duration_seconds, int(sample_rate * duration_seconds), endpoint=False
+    )
 
     # Generate sine waves for both ears
     left_tone = np.sin(2 * np.pi * base_freq * t)
@@ -28,10 +33,10 @@ def play_binaural_beat(
 
     # Play the stereo audio
     print(
-        f"Playing binaural beats with {base_freq} Hz (left) and {base_freq + beat_freq} Hz (right) for {duration} seconds."
+        f"Playing binaural beats with {base_freq} Hz (left) and {base_freq + beat_freq} Hz (right) for {duration} minutes."
     )
     sd.play(stereo_signal, samplerate=sample_rate)
-    sd.wait()  # Wait until playback is finished
+    sd.wait()
 
 
 if __name__ == "__main__":
@@ -39,7 +44,7 @@ if __name__ == "__main__":
     try:
         base = float(input("Enter base frequency (Hz) [e.g., 220]: ") or 220)
         beat = float(input("Enter beat frequency (Hz) [e.g., 15]: ") or 15)
-        dur = float(input("Enter duration (seconds) [e.g., 10]: ") or 10)
+        dur = float(input("Enter duration (minutes) [e.g., 10]: ") or 10)
     except ValueError:
         print("Invalid input. Using default values.")
         base, beat, dur = 220, 15, 10
