@@ -2,62 +2,69 @@ import numpy as np
 import sounddevice as sd
 import threading
 
-# Configuration Constants
-DEFAULT_DURATION = 300  # seconds (5 minutes)
+# Configuration constants
+DEFAULT_DURATION = 25  # minutes
+DEFAULT_VOLUME = 0.1  # 0.0 to 1.0
 DEFAULT_SAMPLE_RATE = 44100  # Hz
-DEFAULT_VOLUME = 0.5  # Volume (0.0 - 1.0)
-VOLUME_MULTIPLIER = 10  # Amplification factor
 
 
-def generate_brown_noise(
+def play_brown_noise(
     duration=DEFAULT_DURATION,
     sample_rate=DEFAULT_SAMPLE_RATE,
     volume=DEFAULT_VOLUME,
-    volume_multiplier=VOLUME_MULTIPLIER,
 ):
     """
-    Generates and plays Brown Noise.
+    Plays brown noise for a given duration.
 
     Parameters:
-    - duration: Duration of playback in seconds.
+    - duration: Duration of the noise in minutes.
     - sample_rate: Audio sample rate.
-    - volume: Volume level (0.0 to 1.0).
-    - volume_multiplier: Amplification factor for the volume.
+    - volume: Volume scaling factor (0.0 to 1.0).
     """
-    num_samples = int(duration * sample_rate)
+    # Convert minutes to seconds
+    duration_seconds = duration * 60
+    n_samples = int(sample_rate * duration_seconds)
 
-    # Generate Brownian motion (cumulative sum of random steps)
-    brown_noise = np.cumsum(np.random.randn(num_samples))
+    # Generate white noise
+    white_noise = np.random.randn(n_samples)
 
-    # Normalize to range [-1, 1] like the sine waves
-    brown_noise = brown_noise / np.max(np.abs(brown_noise))
+    # Generate brown noise by cumulatively summing the white noise
+    brown_noise = np.cumsum(white_noise)
 
-    # Scale volume
-    brown_noise *= volume * volume_multiplier
+    # Normalize to prevent clipping (scale to -1.0 to 1.0)
+    max_val = np.max(np.abs(brown_noise))
+    if max_val != 0:
+        brown_noise = brown_noise / max_val
 
-    # Play in separate thread to allow stopping
+    # Apply volume scaling
+    brown_noise *= volume
+
+    # Create a stereo signal (same signal on both channels)
+    stereo_signal = np.column_stack((brown_noise, brown_noise))
+
     def play():
-        print(f"Playing Brown Noise for {duration} seconds...")
-        sd.play(brown_noise, samplerate=sample_rate)
+        print(f"Playing brown noise for {duration} minutes at volume {volume}.")
+        sd.play(stereo_signal, samplerate=sample_rate)
         sd.wait()
 
+    # Start playback in a separate thread so we can stop it early if needed.
     thread = threading.Thread(target=play)
     thread.start()
 
-    # Allow manual stop
     input("\nPress Enter to stop playback early...\n")
     sd.stop()
     print("Playback stopped.")
 
 
 if __name__ == "__main__":
+    # Get user inputs for customization
     try:
-        dur = float(
-            input("Enter duration (seconds) [default 300]: ") or DEFAULT_DURATION
+        dur = float(input("Enter duration (minutes) [e.g., 25]: ") or DEFAULT_DURATION)
+        volume = float(
+            input("Enter volume (0.0 to 1.0) [e.g., 0.1]: ") or DEFAULT_VOLUME
         )
-        vol = float(input("Enter volume (0.0 - 1.0) [default 0.5]: ") or DEFAULT_VOLUME)
     except ValueError:
         print("Invalid input. Using default values.")
-        dur, vol = DEFAULT_DURATION, DEFAULT_VOLUME
+        dur, volume = DEFAULT_DURATION, DEFAULT_VOLUME
 
-    generate_brown_noise(duration=dur, volume=vol)
+    play_brown_noise(duration=dur, volume=volume)
