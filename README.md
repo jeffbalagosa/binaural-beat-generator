@@ -29,17 +29,25 @@ A simple Python script that generates binaural beats to enhance focus, relaxatio
 
 ### 🏃 Run the Script
 ```sh
-python main.py
+python main.py [options]
 ```
 
-You'll be prompted to enter:
-- **Base frequency** (default: 100 Hz)
-- **Beat frequency** (default: 15 Hz)
-- **Duration** in minutes (default: 25 minutes)
+Available options:
+- `--base`: Base frequency in Hz (default: 100)
+- `--beat`: Beat frequency in Hz (default: 15)
+- `--duration`: Duration in minutes (default: 25)
+- `--volume`: Volume from 0.0 to 1.0 (default: 0.1)
 
-Or, you can run it with hardcoded defaults:
+Examples:
 ```sh
+# Run with defaults
 python main.py
+
+# Custom configuration
+python main.py --base 140 --beat 18 --duration 30 --volume 0.2
+
+# Deep meditation preset
+python main.py --base 80 --beat 6 --duration 45
 ```
 
 ### 🎧 Stopping Early

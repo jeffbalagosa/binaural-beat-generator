@@ -1,6 +1,7 @@
 import numpy as np
 import sounddevice as sd
 import threading
+import argparse
 
 # Configuration constants
 DEFAULT_BASE_FREQ = 100  # Hz
@@ -59,25 +60,37 @@ def play_binaural_beat(
 
 
 if __name__ == "__main__":
-    # Get user inputs for customization
-    try:
-        base = float(
-            input("Enter base frequency (Hz) [e.g., 100]: ") or DEFAULT_BASE_FREQ
-        )
-        beat = float(
-            input("Enter beat frequency (Hz) [e.g., 15]: ") or DEFAULT_BEAT_FREQ
-        )
-        dur = float(input("Enter duration (minutes) [e.g., 25]: ") or DEFAULT_DURATION)
-        volume = float(
-            input("Enter volume (0.0 to 1.0) [e.g., 0.1]: ") or DEFAULT_VOLUME
-        )
-    except ValueError:
-        print("Invalid input. Using default values.")
-        base, beat, dur, volume = (
-            DEFAULT_BASE_FREQ,
-            DEFAULT_BEAT_FREQ,
-            DEFAULT_DURATION,
-            DEFAULT_VOLUME,
-        )
+    parser = argparse.ArgumentParser(description="Generate binaural beats")
+    parser.add_argument(
+        "--base",
+        type=float,
+        default=DEFAULT_BASE_FREQ,
+        help=f"Base frequency in Hz (default: {DEFAULT_BASE_FREQ})",
+    )
+    parser.add_argument(
+        "--beat",
+        type=float,
+        default=DEFAULT_BEAT_FREQ,
+        help=f"Beat frequency in Hz (default: {DEFAULT_BEAT_FREQ})",
+    )
+    parser.add_argument(
+        "--duration",
+        type=float,
+        default=DEFAULT_DURATION,
+        help=f"Duration in minutes (default: {DEFAULT_DURATION})",
+    )
+    parser.add_argument(
+        "--volume",
+        type=float,
+        default=DEFAULT_VOLUME,
+        help=f"Volume from 0.0 to 1.0 (default: {DEFAULT_VOLUME})",
+    )
 
-    play_binaural_beat(base_freq=base, beat_freq=beat, duration=dur, volume=volume)
+    args = parser.parse_args()
+
+    play_binaural_beat(
+        base_freq=args.base,
+        beat_freq=args.beat,
+        duration=args.duration,
+        volume=args.volume,
+    )
